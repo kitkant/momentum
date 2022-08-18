@@ -8,7 +8,19 @@ const timeOfDay = {
     'ru': ['Доброе утро', 'Добрый день', 'Добрый вечер', 'Спокойной ночи'],
     'pl': ['Добрай раніцы', 'Добры дзень', 'Добры вечар', 'Дабранач']
 }
+const options = {
+	method: 'GET',
+	headers: {
+		'X-RapidAPI-Key': '88ac635dd6msh5e71c8b0bc6ad3ep1d67cajsnf9070ab93bf8',
+		'X-RapidAPI-Host': 'open-weather13.p.rapidapi.com'
+	}
+};
 
+fetch('https://open-weather13.p.rapidapi.com/kyiv/landon', options)
+	.then(response => response.json())
+	.then(response => console.log(response))
+	.catch(err => console.error(err));
+const APIKEY = '434f66b8e0981877fdd0ff7e225ac11d'
 const getTime = () =>{
     setInterval(()=>{
         const now = new Date();
