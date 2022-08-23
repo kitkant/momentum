@@ -15,6 +15,9 @@ const playerIcon = document.querySelectorAll('.player-icon')
 const audio = document.querySelector('.audio')
 const musics = document.querySelectorAll('.music')
 
+const quotation = document.querySelector('.quote')
+const author = document.querySelector('.author')
+const changeQuote = document.querySelector('.change-quote')
 
 HTMLAudioElement.prototype.stop = function()
 {
@@ -95,6 +98,11 @@ const getTimeOfDay = (e) => greeting.innerHTML = timeOfDay[lang][e]
 const setTextLocalStorage = event => localStorage.setItem('text', event)
 const setCityLocalStorage = event => localStorage.setItem('city', event)
 
+const getQuotes = () =>{
+    let random = quotes[Math.floor(Math.random() * quotes.length)];
+    quotation.innerText = `“${random.quote}.”`;
+    author.innerText = random.source;
+}
 const getDate = () =>{
     const now = new Date();
     const options = { weekday: 'long', month: 'long', day: 'numeric' };
@@ -151,6 +159,7 @@ function app(){
     musicQueue.enqueueEnd(init)
     getTime()
     getDate()
+    getQuotes()
     textLS.placeholder = "Type name here..";
     textLS.value = localStorage.getItem("text")
     if(localStorage.getItem("city") === '')
@@ -212,6 +221,7 @@ function app(){
 }
 
 textCity.addEventListener('change', getDateWeater)
+changeQuote.addEventListener('click', getQuotes)
 
 
 app()
