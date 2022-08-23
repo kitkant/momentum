@@ -4,23 +4,47 @@ const greeting = document.querySelector('.greeting')
 const textLS = document.querySelector('.name')
 const textCity = document.querySelector('.city')
 //Weather
-
 const weatherIcon = document.querySelector('.weather-icon')
 const temperature = document.querySelector('.temperature')
 const weatherDescription = document.querySelector('.weather-description')
 const wind = document.querySelector('.wind')
 const humidity = document.querySelector('.humidity')
 const weatherError = document.querySelector('.weather-error')
-
 //Audio
 const playerIcon = document.querySelectorAll('.player-icon')
+const audio = document.querySelector('.audio')
+const musics = document.querySelectorAll('.music')
 
+
+HTMLAudioElement.prototype.stop = function()
+{
+this.pause();
+this.currentTime = 0.0;
+}
+const quotes = [
+    { 
+     "quote" : "The only sin is ignorance", 
+     "source" : "Christopher Marlowe" 
+    },
+    {
+     "quote" : "A man is his own easiest dupe, for what he wishes to be true he generally believes to be true", 
+     "source" : "Demosthenes"
+    },
+    {
+     "quote" : "A lie can travel halfway around the world while the truth is putting on its shoes", 
+     "source" : "Mark Twain"
+    }
+   ]
 const lang = navigator.language.split('-')[0]
+const musicSRC = ['./assets/sounds/Aqua_Caelestis.mp3', './assets/sounds/Ennio_Morricone.mp3', './assets/sounds/River_Flows_In_You.mp3','./assets/sounds/Summer_Wind.mp3']
 
 const musicQueue = {
-    queue: [0, 1, 2, 3],
-    enqueue: function(item) {this.queue.push(item);},
-    dequeue: function() { return this.queue.shift();}
+    queue: [0, 1, 2 ,3 ],
+    enqueueEnd: function(item) {this.queue.push(item);},
+    dequeueStart: function() { return this.queue.shift();},
+    enqueueStart: function(item) {this.queue.unshift(item);},
+    dequeueEnd: function() { return this.queue.pop();},
+    state: 'next'
 }
 
 const timeOfDay = {
@@ -77,12 +101,11 @@ const getDate = () =>{
     mainDate.innerHTML = now.toLocaleDateString(lang, options)
 }
 
-const getDateWeater = () =>{
-    fetch(`http://api.weatherstack.com/current?access_key=bcd4c9e2298e5fe6d8112c0dd5a95dc3&query=${localStorage.getItem("city")}`)
+const getDateWeater = async () =>{
+    await fetch(`http://api.weatherstack.com/current?access_key=bcd4c9e2298e5fe6d8112c0dd5a95dc3&query=${localStorage.getItem("city")}`)
 	.then(response => response.json())
 	.then(response => {
-        
-        console.log(response)
+         
         weatherError.innerHTML = ''
         weatherIcon.src = response.current.weather_icons[0]
         temperature.innerHTML = response.current.temperature + '°C'
@@ -91,6 +114,7 @@ const getDateWeater = () =>{
         humidity.innerHTML = 'Humidity: ' + response.current.humidity + '%'
     })
 	.catch(err => {
+    
         weatherIcon.src = ''
         temperature.innerHTML = ''
         weatherDescription.innerHTML = ''
@@ -99,16 +123,32 @@ const getDateWeater = () =>{
         weatherError.innerHTML = `Error! city not found for '${textCity.value}'!`
     });
 }
-
-const playMusic = ( ) =>{
-
+const clearActive = () =>{
+    musics.forEach(e =>{
+        e.classList.remove('active_music')
+    })
+    
+}
+const activeMusic = () =>{
+    clearActive()
+    musics[musicQueue.queue[0]].classList.add('active_music')
+}
+const playMusic = () =>{
+    audio.play()
+    playerIcon[1].classList.remove('play') 
+    playerIcon[1].classList.add('pause')
 }
 const pauseMusic = ( ) =>{
-
+    audio.pause()
+    playerIcon[1].classList.add('play') 
+    playerIcon[1].classList.remove('pause')
 }
 
 function app(){
-   
+    musics[0].classList.add('active_music')
+    let init = musicQueue.dequeueStart()
+    audio.src = musicSRC[init]
+    musicQueue.enqueueEnd(init)
     getTime()
     getDate()
     textLS.placeholder = "Type name here..";
@@ -119,17 +159,53 @@ function app(){
     getDateWeater()
    
     playerIcon.forEach((event) =>{
-        event.addEventListener('click', e =>{
-           
+        event.addEventListener('click', (e) =>{
+            if(e.target.classList[1] === 'play-prev')
+               {
+                playMusic()
+                let next = musicQueue.dequeueEnd()
+                
+                if(musicQueue.state === 'next')
+                    {   
+                        musicQueue.enqueueStart(next)
+                        next = musicQueue.dequeueEnd()
+                        musicQueue.state = 'prev'
+                        
+                    }
+                    clearActive()
+                        musics[next].classList.add('active_music')
+                audio.stop()    
+                audio.src = musicSRC[next]
+                musicQueue.enqueueStart(next)
+                audio.play()
+               }
+            if(e.target.classList[1] === 'play-next')
+              { 
+                playMusic()
+                let next = musicQueue.dequeueStart()
+                if(musicQueue.state === 'prev')
+                {
+                    musicQueue.enqueueEnd(next)
+                    next = musicQueue.dequeueStart()
+                    musicQueue.state = 'next'
+                    
+                }
+                clearActive()
+                    musics[next].classList.add('active_music')
+                audio.stop()    
+                audio.src = musicSRC[next]
+                musicQueue.enqueueEnd(next)
+                audio.play()
+              }
+             
             if(e.target.classList[1] === 'play')
-            { 
-                e.target.classList.remove('play') 
-                e.target.classList.add('pause')
-            } else if(e.target.classList[1] === 'pause')
-            {
-                e.target.classList.add('play') 
-                e.target.classList.remove('pause')
-            }
+               { 
+                 
+                playMusic()
+                }
+            else if(e.target.classList[1] === 'pause')
+                pauseMusic()
+           
         })
     })
 
