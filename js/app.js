@@ -18,6 +18,10 @@ const musics = document.querySelectorAll('.music')
 const quotation = document.querySelector('.quote')
 const author = document.querySelector('.author')
 const changeQuote = document.querySelector('.change-quote')
+// slider
+const slideNext = document.querySelector('.slide-next')
+const slidePrev = document.querySelector('.slide-prev')
+
 
 HTMLAudioElement.prototype.stop = function()
 {
@@ -50,10 +54,33 @@ const musicQueue = {
     state: 'next'
 }
 
+const bgQueue = {
+    queue: [1, 2 ,3, 4 ,5 ,6 ,7 ,8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+    enqueueEnd: function(item) {this.queue.push(item);},
+    dequeueStart: function() { return this.queue.shift();},
+    enqueueStart: function(item) {this.queue.unshift(item);},
+    dequeueEnd: function() { return this.queue.pop();},
+    revers: function(number){
+        let item 
+        if(this.queue[0] !== number)
+            {
+                item = this.dequeueStart()
+                this.enqueueEnd(item)
+                this.revers(number)
+            }
+        
+    },
+    state: 'next'
+}
+
+
+ 
 const timeOfDay = {
     'en': ['Good morning', 'Good afternoon', 'Good evening', 'Good night'],
     'ru': ['Доброе утро', 'Добрый день', 'Добрый вечер', 'Спокойной ночи'],
-    'pl': ['Добрай раніцы', 'Добры дзень', 'Добры вечар', 'Дабранач']
+    'pl': ['Добрай раніцы', 'Добры дзень', 'Добры вечар', 'Дабранач'],
+    'time':['evening', 'afternoon', 'morning', 'night'],
+    'state': 0
 }
 
 const APIKEY = 'bcd4c9e2298e5fe6d8112c0dd5a95dc3'
@@ -76,14 +103,30 @@ const getTime = () =>{
         time.innerHTML = formatted
        
 
-        if(hours >= 6  && hours < 12)
-            getTimeOfDay(0)
-        else if (hours >= 12  && hours < 18)
+        if(hours >= 6  && hours < 12){
+                getTimeOfDay(0)
+                if(timeOfDay.state !== 0)
+                {changeBG(0)
+                    timeOfDay.state = 0}
+            }
+        else if (hours >= 12  && hours < 18){
             getTimeOfDay(1)
-        else if (hours >= 18  && hours <= 23)
+            if(timeOfDay.state !== 1)
+            {changeBG(1)
+                timeOfDay.state = 1}
+        }
+        else if (hours >= 18  && hours <= 23){
             getTimeOfDay(2)
-        else if (hours >= 0  && hours < 6)
+            if(timeOfDay.state !== 2)
+                    {changeBG(2)
+                        timeOfDay.state = 2}
+        }
+        else if (hours >= 0  && hours < 6){
             getTimeOfDay(3)
+            if(timeOfDay.state !== 3)
+                    {changeBG(3)
+                        timeOfDay.state = 3}
+        }
         if(hours === 0)
             getDate()
         if(localStorage.getItem("text") !== document.querySelector('.name').value)
@@ -92,8 +135,9 @@ const getTime = () =>{
             setCityLocalStorage(document.querySelector('.city').value)
     }, 1000)
 }
+const changeBG = () => document.body.style.backgroundImage = `url('https://raw.githubusercontent.com/kitkant/stage1-tasks/main/images/${timeOfDay.time[timeOfDay.state]}/${Math.floor(Math.random() * (20 - 1 + 1)) + 1}.jpg')`
 
-const getTimeOfDay = (e) => greeting.innerHTML = timeOfDay[lang][e] 
+const getTimeOfDay = (e) => greeting.innerHTML = timeOfDay[lang][e]
 
 const setTextLocalStorage = event => localStorage.setItem('text', event)
 const setCityLocalStorage = event => localStorage.setItem('city', event)
@@ -113,7 +157,6 @@ const getDateWeater = async () =>{
     await fetch(`http://api.weatherstack.com/current?access_key=bcd4c9e2298e5fe6d8112c0dd5a95dc3&query=${localStorage.getItem("city")}`)
 	.then(response => response.json())
 	.then(response => {
-         
         weatherError.innerHTML = ''
         weatherIcon.src = response.current.weather_icons[0]
         temperature.innerHTML = response.current.temperature + '°C'
@@ -153,11 +196,12 @@ const pauseMusic = ( ) =>{
 }
 
 function app(){
+    changeBG()
+    getTime()
     musics[0].classList.add('active_music')
     let init = musicQueue.dequeueStart()
     audio.src = musicSRC[init]
     musicQueue.enqueueEnd(init)
-    getTime()
     getDate()
     getQuotes()
     textLS.placeholder = "Type name here..";
