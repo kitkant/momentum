@@ -8,7 +8,9 @@
   margin: 0;
   padding: 0;
 }
-
+.active_music{
+  color:red;
+}
 body {
   min-width: 480px;
   min-height: 100vh;
@@ -16,7 +18,7 @@ body {
   font-size: 16px;
   color: #fff;
   text-align: center;
-  background: url("../assets/img/bg.jpg") center/cover, rgba(0, 0, 0, 0.5);
+  
   background-blend-mode: multiply;
   transition: background-image 1s ease-in-out;
 }
@@ -107,6 +109,9 @@ body {
 }
 
 .pause {
+  width: 40px;
+  height: 40px;
+  background-size: 40px 40px;
   background-image: url("../assets/svg/pause.svg");
 }
 
