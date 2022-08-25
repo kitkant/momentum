@@ -21,8 +21,9 @@ const changeQuote = document.querySelector('.change-quote')
 // slider
 const slideNext = document.querySelector('.slide-next')
 const slidePrev = document.querySelector('.slide-prev')
+const BackGround = document.body.style.backgroundImage
 
-
+const bgNum = Math.floor(Math.random() * (20 - 1 + 1)) + 1
 HTMLAudioElement.prototype.stop = function()
 {
 this.pause();
@@ -69,8 +70,7 @@ const bgQueue = {
                 this.revers(number)
             }
         
-    },
-    state: 'next'
+    }
 }
 
 
@@ -87,9 +87,6 @@ const APIKEY = 'bcd4c9e2298e5fe6d8112c0dd5a95dc3'
 const getTime = () =>{
     setInterval(()=>{
         const now = new Date();
-      
-      
-        
         const hours = now.getHours()
         const minutes = now.getMinutes()
         const seconds = now.getSeconds()
@@ -135,13 +132,28 @@ const getTime = () =>{
             setCityLocalStorage(document.querySelector('.city').value)
     }, 1000)
 }
-const changeBG = () => document.body.style.backgroundImage = `url('https://raw.githubusercontent.com/kitkant/stage1-tasks/main/images/${timeOfDay.time[timeOfDay.state]}/${Math.floor(Math.random() * (20 - 1 + 1)) + 1}.jpg')`
+// 
+const changeBG = async (item) => {
+    if(item === 'slide-prev'){
+        let next = bgQueue.dequeueEnd()
+        bgQueue.enqueueStart(next)
+        }
+    if(item === 'slide-next')
+        { 
+        let next = bgQueue.dequeueStart()
+        bgQueue.enqueueEnd(next)
+        
+        }
+        
+    
+    
+    console.log(item, bgQueue.queue[0], bgQueue.queue)
+    document.body.style.backgroundImage = await `url('https://raw.githubusercontent.com/kitkant/stage1-tasks/main/images/${timeOfDay.time[timeOfDay.state]}/${bgQueue.queue[0]}.webp')`
 
+}
 const getTimeOfDay = (e) => greeting.innerHTML = timeOfDay[lang][e]
-
 const setTextLocalStorage = event => localStorage.setItem('text', event)
 const setCityLocalStorage = event => localStorage.setItem('city', event)
-
 const getQuotes = () =>{
     let random = quotes[Math.floor(Math.random() * quotes.length)];
     quotation.innerText = `“${random.quote}.”`;
@@ -152,7 +164,6 @@ const getDate = () =>{
     const options = { weekday: 'long', month: 'long', day: 'numeric' };
     mainDate.innerHTML = now.toLocaleDateString(lang, options)
 }
-
 const getDateWeater = async () =>{
     await fetch(`http://api.weatherstack.com/current?access_key=bcd4c9e2298e5fe6d8112c0dd5a95dc3&query=${localStorage.getItem("city")}`)
 	.then(response => response.json())
@@ -196,7 +207,8 @@ const pauseMusic = ( ) =>{
 }
 
 function app(){
-    changeBG()
+    document.body.style.backgroundImage = `url('https://raw.githubusercontent.com/kitkant/stage1-tasks/main/images/${timeOfDay.time[timeOfDay.state]}/${bgNum}.webp')`
+    bgQueue.revers(bgNum)
     getTime()
     musics[0].classList.add('active_music')
     let init = musicQueue.dequeueStart()
@@ -252,10 +264,7 @@ function app(){
               }
              
             if(e.target.classList[1] === 'play')
-               { 
-                 
                 playMusic()
-                }
             else if(e.target.classList[1] === 'pause')
                 pauseMusic()
            
@@ -266,6 +275,6 @@ function app(){
 
 textCity.addEventListener('change', getDateWeater)
 changeQuote.addEventListener('click', getQuotes)
-
-
+slidePrev.addEventListener('click', (e)=> changeBG(e.target.classList[0]))
+slideNext.addEventListener('click', (e)=> changeBG(e.target.classList[0]))
 app()
