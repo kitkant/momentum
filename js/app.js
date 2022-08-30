@@ -56,7 +56,7 @@ const musicQueue = {
 }
 
 const bgQueue = {
-    queue: [1, 2 ,3, 4 ,5 ,6 ,7 ,8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+    queue: [1, 2 ,3 , 4 ,5 ,6 ,7 ,8 , 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
     enqueueEnd: function(item) {this.queue.push(item);},
     dequeueStart: function() { return this.queue.shift();},
     enqueueStart: function(item) {this.queue.unshift(item);},
@@ -133,22 +133,18 @@ const getTime = () =>{
     }, 1000)
 }
 // 
-const changeBG = async (item) => {
+const changeBG =  (item) => {
     if(item === 'slide-prev'){
         let next = bgQueue.dequeueEnd()
         bgQueue.enqueueStart(next)
         }
-    if(item === 'slide-next')
-        { 
+    if(item === 'slide-next'){ 
         let next = bgQueue.dequeueStart()
         bgQueue.enqueueEnd(next)
-        
         }
+        // url('https://raw.githubusercontent.com/kitkant/stage1-tasks/main/images
         
-    
-    
-    console.log(item, bgQueue.queue[0], bgQueue.queue)
-    document.body.style.backgroundImage = await `url('https://raw.githubusercontent.com/kitkant/stage1-tasks/main/images/${timeOfDay.time[timeOfDay.state]}/${bgQueue.queue[0]}.webp')`
+    document.body.style.backgroundImage =   `url('./images/${timeOfDay.time[timeOfDay.state]}/${bgQueue.queue[0]}.webp')`
 
 }
 const getTimeOfDay = (e) => greeting.innerHTML = timeOfDay[lang][e]
@@ -207,7 +203,7 @@ const pauseMusic = ( ) =>{
 }
 
 function app(){
-    document.body.style.backgroundImage = `url('https://raw.githubusercontent.com/kitkant/stage1-tasks/main/images/${timeOfDay.time[timeOfDay.state]}/${bgNum}.webp')`
+    document.body.style.backgroundImage = `url('./images/${timeOfDay.time[timeOfDay.state]}/${bgNum}.webp')`
     bgQueue.revers(bgNum)
     getTime()
     musics[0].classList.add('active_music')
